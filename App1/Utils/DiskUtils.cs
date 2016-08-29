@@ -16,13 +16,53 @@ namespace FindBigFiles.Utils
     class DiskUtils
     {
 
-        static ListView listView;
 
-        public async static void scanDirectory(StorageFolder directory, ListView listview)
+        static ISortedSetReporter sortedSetReporter;
+
+        internal static string showHumanReadbleFromBytes(ulong size)
         {
-            listView = listview;
-            await getFilesForDirectory(directory);
-            await getDirectoriesForDirectory(directory);
+            int index = 0;
+            string[] abbrev = new String[] {"bytes", "k","m","g","t" };
+            ulong units = size;
+            double remainder = 0;
+            while(units > 1024)
+            {
+                units = (ulong)Math.Floor(1.0* units / 1024);
+                size = size - ((1024)*units);
+                index++;
+            }
+            remainder = size / 1024.0;
+
+            return units + abbrev[index];
+        }
+
+        public async static void scanDirectory(StorageFolder directory, ISortedSetReporter sortedSetReporter)
+        {
+            LinkedList<StorageFolder> queue = new LinkedList<StorageFolder>();
+            SortedSet<FileInfo> mSortedFileInfos = new SortedSet<FileInfo>();
+            DiskUtils.sortedSetReporter = sortedSetReporter;
+
+            queue.AddLast(directory);
+
+            StorageFolder curr = null;
+            while (queue.Count > 0)
+            {
+                curr = queue.First.Value;
+                queue.RemoveFirst();
+
+                List<FileInfo> fileInfos = await getFilesForDirectory(curr);
+                IEnumerable<StorageFolder> directories = await getDirectoriesForDirectory(curr);
+                foreach(StorageFolder folder in directories)
+                {
+                    queue.AddLast(folder);
+                }
+
+                foreach (FileInfo f in fileInfos)
+                {
+                    mSortedFileInfos.Add(f);
+                }
+                sortedSetReporter.ReportSet(mSortedFileInfos);
+            }
         }
 
         public async static Task<List<FileInfo>> getFilesForDirectory(StorageFolder directory)
@@ -34,19 +74,15 @@ namespace FindBigFiles.Utils
             foreach (StorageFile file in files)
             {
                 FileInfo fileInfo = new FileInfo(file);
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => listView.Items.Add(fileInfo.GetUIFileInfo()));
                 fileInfos.Add(fileInfo);
-
             }
 
             return fileInfos;
         }
 
-        public async static Task<FileInfo[]> getDirectoriesForDirectory(StorageFolder directory)
+        public async static Task<IEnumerable<StorageFolder>> getDirectoriesForDirectory(StorageFolder directory)
         {
-
-            IReadOnlyList<StorageFolder> directories = await directory.GetFoldersAsync();
-            return null;
+            return await directory.GetFoldersAsync();
         }
 
 

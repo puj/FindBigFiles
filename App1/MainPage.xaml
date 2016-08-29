@@ -8,14 +8,14 @@
     mc:Ignorable="d">
 
     <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="0">
-        <TextBlock x:Name="txtStatus" Margin="0,0,0,-0.667" RelativePanel.AlignHorizontalCenterWithPanel="True" TextWrapping="Wrap" Text="Status" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="22"/>
+        <TextBlock x:Name="txtStatus" Margin="0,32,0,0" RelativePanel.AlignHorizontalCenterWithPanel="True" TextWrapping="Wrap" Text="Status" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="22"/>
         <ListView x:Name="listView" RelativePanel.AlignHorizontalCenterWithPanel="True" Margin="0"  RelativePanel.Below="txtStatus">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <TextBlock Text="{Binding Path}"></TextBlock>
-                        <TextBlock Text="{Binding Size}"></TextBlock>
-                    </Grid>
+                    <RelativePanel HorizontalAlignment="Center">
+                        <TextBlock Padding="2" x:Name="itemTxtSize"  Text="{Binding Size}" HorizontalAlignment="Center" VerticalAlignment="Stretch" RelativePanel.AlignHorizontalCenterWith="" RelativePanel.AlignHorizontalCenterWithPanel="False" ></TextBlock>
+                        <TextBlock Padding="2" x:Name="itemTxtPath" RelativePanel.RightOf="itemTxtSize" Text="{Binding Path}" HorizontalAlignment="Center" VerticalAlignment="Stretch"></TextBlock>
+                    </RelativePanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

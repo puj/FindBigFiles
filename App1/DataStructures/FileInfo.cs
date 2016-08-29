@@ -9,7 +9,7 @@ using Windows.Storage.FileProperties;
 
 namespace FindBigFiles.DataStructures
 {
-    class FileInfo : IComparable<FileInfo>
+    public class FileInfo : IComparable<FileInfo>
     {
         UIFileInfo uiFileInfo = null;
         StorageFile file;
