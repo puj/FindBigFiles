@@ -18,6 +18,7 @@ namespace FindBigFiles.Utils
 
 
         static ISortedSetReporter sortedSetReporter;
+        static ICurrentDirectoryReporter currentDirectoryReporter;
 
         internal static string showHumanReadbleFromBytes(ulong size)
         {
@@ -36,11 +37,12 @@ namespace FindBigFiles.Utils
             return units + abbrev[index];
         }
 
-        public async static void scanDirectory(StorageFolder directory, ISortedSetReporter sortedSetReporter)
+        public async static void scanDirectory(StorageFolder directory, ISortedSetReporter sortedSetReporter, ICurrentDirectoryReporter currentDirectoryReporter)
         {
             LinkedList<StorageFolder> queue = new LinkedList<StorageFolder>();
             SortedSet<FileInfo> mSortedFileInfos = new SortedSet<FileInfo>();
             DiskUtils.sortedSetReporter = sortedSetReporter;
+            DiskUtils.currentDirectoryReporter = currentDirectoryReporter;
 
             queue.AddLast(directory);
 
@@ -49,6 +51,7 @@ namespace FindBigFiles.Utils
             {
                 curr = queue.First.Value;
                 queue.RemoveFirst();
+                currentDirectoryReporter.ReportCurrentDirectory(curr.Path);
 
                 List<FileInfo> fileInfos = await getFilesForDirectory(curr);
                 IEnumerable<StorageFolder> directories = await getDirectoriesForDirectory(curr);

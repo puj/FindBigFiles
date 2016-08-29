@@ -29,7 +29,7 @@ namespace App1
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page, ISortedSetReporter
+    public sealed partial class MainPage : Page, ISortedSetReporter, ICurrentDirectoryReporter
     {
         public static String path = @"C:/";
         public static int NUM_TO_SHOW = 5;
@@ -52,6 +52,10 @@ namespace App1
             CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => UpdateUIList(sortedSet));
         }
 
+        public void ReportCurrentDirectory(string currentDirectoryName)
+        {
+            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => txtStatus.Text = "Currently scanning '" + currentDirectoryName +"'");
+        }
 
         public void UpdateUIList(SortedSet<FindBigFiles.DataStructures.FileInfo> sortedSet)
         {
@@ -84,9 +88,8 @@ namespace App1
                     // Application now has read/write access to all contents in the picked folder
                     // (including other sub-folder contents)
                     Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace("PickedFolderToken", folder);
-                    txtStatus.Text = "current scanning... " + folder.Name;
 
-                    Task.Run(() => DiskUtils.scanDirectory(folder, this));
+                    Task.Run(() => DiskUtils.scanDirectory(folder, this, this));
                 }
                 else
                 {
@@ -99,7 +102,6 @@ namespace App1
 
             }
         }
-
 
     }
 }

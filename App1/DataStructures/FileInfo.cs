@@ -25,7 +25,6 @@ namespace FindBigFiles.DataStructures
         private void SetProperties(IAsyncOperation<BasicProperties> asyncInfo, AsyncStatus asyncStatue)
         {
             size = asyncInfo.GetResults().Size;
-            Utils.Logger.i(ToString());
         }
 
 
